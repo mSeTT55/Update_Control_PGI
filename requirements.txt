@@ -1,2 +1,4 @@
 Flask>=2.0
 paramiko>=2.7
+ldap3>=2.9
+python-dotenv>=0.21.0
