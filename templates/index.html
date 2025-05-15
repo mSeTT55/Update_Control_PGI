@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Atualizar PGI</title>
+</head>
+<body style="font-family: sans-serif; padding: 2rem;">
+  <h1>Atualizar PGI</h1>
+  <form method="post">
+    <button type="submit">Executar Update</button>
+  </form>
+
+  {% if output is not none %}
+    <h2>Log de Execução:</h2>
+    <pre style="background:#f5f5f5; padding:1rem; border:1px solid #ddd;">
+{{ output }}
+    </pre>
+  {% endif %}
+</body>
+</html>
