@@ -1,0 +1,33 @@
+body {
+  background: #f0f0f3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.button-container {
+  display: flex;
+}
+
+.neumorphic-button {
+  background: #f0f0f3;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 30px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #6b6b8d;
+  box-shadow: 
+    8px 8px 16px #d1d9e6,
+   -8px -8px 16px #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.neumorphic-button:hover {
+  box-shadow: 
+    inset 4px 4px 10px #d1d9e6,
+    inset -4px -4px 10px #ffffff;
+}

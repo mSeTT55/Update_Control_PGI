@@ -1,0 +1,156 @@
+/* =============================
+   VARIÁVEIS (cores, fontes, etc.)
+   ============================= */
+:root {
+    --primary-color: #3d5462;
+    --secondary-color: #6c757d;
+    --accent-color: #FAA80A;
+    --bg-color: #f5f7fa;
+    --font-family: 'Poppins', sans-serif;
+    --transition-speed: 0.3s;
+}
+
+/* =============================
+   RESET E GERAIS
+   ============================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: var(--font-family);
+    background: var(--bg-color);
+    color: var(--primary-color);
+}
+
+/* =============================
+   Home Container (background e layout)
+   ============================= */
+.home-container {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.home-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("/static/assets/lumine.jpg") center/cover no-repeat;
+    /* escurecer e desfocar o fundo */
+    filter: brightness(0.4) blur(6px);
+    z-index: -1;
+}
+
+/* =============================
+   Header Group (logo + título)
+   ============================= */
+.header-group {
+    margin-bottom: 1rem;
+}
+
+/* Logo */
+.home-logo {
+    width: 150px;
+    height: auto;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+
+/* Título */
+.home-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+/* =============================
+   Cartão de Login (fundo branco)
+   ============================= */
+.login-card {
+    background: #ffffff;                 
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    width: 320px;
+    margin-top: 20px;
+}
+
+/* Labels e inputs */
+.login-card .form-label {
+    display: block;
+    text-align: left;       /* alinha labels à esquerda */
+    font-weight: 700;       /* negrito */
+    margin-bottom: 0.25rem; /* espaço abaixo da label */
+    color: var(--primary-color);
+}
+.login-card .form-control {
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    transition: border-color var(--transition-speed);
+    background: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;    /* garante espaçamento entre campos */
+}
+.login-card .form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(250, 168, 10, 0.25);
+}
+
+/* Botão Entrar */
+.login-card button {
+    background-color: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background var(--transition-speed);
+}
+.login-card button:hover {
+    background-color: #e69400;
+}
+
+/* Mensagem de erro */
+.login-message {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #dc3545;
+}
+
+/* =============================
+   Botão de Update (screen-update.html)
+   ============================= */
+.btn-home {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    transition: background var(--transition-speed);
+    background-color: var(--accent-color);
+    color: #fff;
+}
+.btn-home:hover {
+    background-color: #e69400;
+}
+
+/* =============================
+   Responsividade
+   ============================= */
+@media (max-width: 1024px) {
+    .home-logo {
+        width: 120px !important;
+    }
+    .login-card {
+        width: 90% !important;
+    }
+    .btn-home {
+        width: 100%;
+        margin: 10px 0 !important;
+    }
+}
