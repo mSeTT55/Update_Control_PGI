@@ -67,7 +67,11 @@ body {
   font-size: 18px; font-weight: 600; margin-bottom: 1rem;
   color: #283E51;
 }
-.versions-card ul { list-style: none; margin: 0; padding: 0; }
+.versions-card ul {
+  max-height: 300px;    /* altura máxima antes de rolar */
+  overflow-y: auto;     /* habilita a scrollbar vertical */
+  padding-right: 0.5rem;/* garante espaço para a barra não cortar o texto */
+}
 .version-item {
   display: flex; justify-content: space-between;
   align-items: center; margin-bottom: 0.75rem;
