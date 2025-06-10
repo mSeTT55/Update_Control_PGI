@@ -1,0 +1,70 @@
+version,log
+Git v1.1.10,"Agent pid 2381452
+Identity added: /root/.ssh/updatepgior (/root/.ssh/updatepgior)
+From bitbucket.org:lupetecnologia/pgi-generico
+ * branch            OR_Producao -> FETCH_HEAD
+ = [up to date]      OR_Producao -> origin/OR_Producao
+Already up to date.
+From bitbucket.org:lupetecnologia/or
+ * branch              Producao   -> FETCH_HEAD
+ = [up to date]        Producao   -> origin/Producao
+Auto packing the repository in background for optimum performance.
+See ""git help gc"" for manual housekeeping.
+warning: The last gc run reported the following. Please correct the root cause
+and remove .git/gc.log.
+Automatic cleanup will not be performed until the file is removed.
+
+fatal: bad object refs/remotes/origin/HEAD
+fatal: failed to run repack
+
+Already up to date.
+unset SSH_AUTH_SOCK;
+unset SSH_AGENT_PID;
+echo Agent pid 2381452 killed;
+"
+Git v1.11.15,"Agent pid 2381621
+Identity added: /root/.ssh/updatepgior (/root/.ssh/updatepgior)
+From bitbucket.org:lupetecnologia/pgi-generico
+ * branch            OR_Producao -> FETCH_HEAD
+ = [up to date]      OR_Producao -> origin/OR_Producao
+Already up to date.
+From bitbucket.org:lupetecnologia/or
+ * branch              Producao   -> FETCH_HEAD
+ = [up to date]        Producao   -> origin/Producao
+Auto packing the repository in background for optimum performance.
+See ""git help gc"" for manual housekeeping.
+warning: The last gc run reported the following. Please correct the root cause
+and remove .git/gc.log.
+Automatic cleanup will not be performed until the file is removed.
+
+fatal: bad object refs/remotes/origin/HEAD
+fatal: failed to run repack
+
+Already up to date.
+unset SSH_AUTH_SOCK;
+unset SSH_AGENT_PID;
+echo Agent pid 2381621 killed;
+"
+Git v1.11.15,"Agent pid 2381787
+Identity added: /root/.ssh/updatepgior (/root/.ssh/updatepgior)
+From bitbucket.org:lupetecnologia/pgi-generico
+ * branch            OR_Producao -> FETCH_HEAD
+ = [up to date]      OR_Producao -> origin/OR_Producao
+Already up to date.
+From bitbucket.org:lupetecnologia/or
+ * branch              Producao   -> FETCH_HEAD
+ = [up to date]        Producao   -> origin/Producao
+Auto packing the repository in background for optimum performance.
+See ""git help gc"" for manual housekeeping.
+warning: The last gc run reported the following. Please correct the root cause
+and remove .git/gc.log.
+Automatic cleanup will not be performed until the file is removed.
+
+fatal: bad object refs/remotes/origin/HEAD
+fatal: failed to run repack
+
+Already up to date.
+unset SSH_AUTH_SOCK;
+unset SSH_AGENT_PID;
+echo Agent pid 2381787 killed;
+"

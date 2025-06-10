@@ -1,4 +1,5 @@
 import os
+import csv
 from dotenv import load_dotenv
 from flask import (
     Flask, render_template, request,
@@ -9,8 +10,9 @@ from functools import wraps
 
 from callback_ldap_auth import authenticate_and_authorize
 from callbacks_update import ssh_login, run_update
+from config import HISTORY_FILE
 
-# carrega .env
+# carrega as variáveis de .env
 load_dotenv()
 secret = os.getenv("FLASK_SECRET", os.urandom(24).hex())
 
@@ -18,8 +20,18 @@ app = Flask(__name__)
 app.secret_key = secret
 logging.basicConfig(level=logging.INFO)
 
-# lista em memória das versões já executadas
+# —————— Carrega histórico do CSV ——————
 executed_versions = []
+if os.path.exists(HISTORY_FILE):
+    with open(HISTORY_FILE, newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        # lemos na ordem cronológica (antigo → novo) e depois invert
+        rows = list(reader)
+        for row in reversed(rows):
+            executed_versions.append({
+                'version': row['version'],
+                'log': row['log']
+            })
 
 def login_required(view):
     @wraps(view)
@@ -59,14 +71,27 @@ def index():
     output = None
 
     if request.method == "POST":
-        # lê a versão informada pelo wizard
+        # pega a versão do formulário
         version = request.form.get("version", "").strip()
         if version:
-            executed_versions.insert(0, f"Git v{version}")
+            version_label = f"Git v{version}"
+            # executa o update via SSH
+            ssh = ssh_login(app.logger)
+            output = run_update(ssh, app.logger)
 
-        # executa o update via SSH
-        ssh = ssh_login(app.logger)
-        output = run_update(ssh, app.logger)
+            # adiciona ao histórico em memória
+            executed_versions.insert(0, {
+                'version': version_label,
+                'log': output
+            })
+
+            # salva no CSV (cria header se não existir)
+            file_exists = os.path.exists(HISTORY_FILE)
+            with open(HISTORY_FILE, 'a', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                if not file_exists:
+                    writer.writerow(['version', 'log'])
+                writer.writerow([version_label, output])
 
     return render_template(
         "screen-update.html",

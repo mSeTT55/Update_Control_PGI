@@ -18,24 +18,27 @@
   <div class="home-container">
     <div class="container py-5">
       <div class="row gy-4">
-
         <!-- Botão que dispara o wizard -->
         <div class="col-md-6 d-flex justify-content-center">
           <button id="btn-start-update"
                   class="btn btn-outline-primary btn-lg rounded-pill px-4">
-            Atualizar PGI
-            <i class="bi bi-arrow-right ms-2"></i>
+            Atualizar PGI <i class="bi bi-arrow-right ms-2"></i>
           </button>
         </div>
-
         <!-- Histórico de versões -->
         <div class="col-md-4 offset-md-2">
           <div class="versions-card p-4">
             <h5>Últimas versões</h5>
             <ul class="mb-0">
               {% if versions %}
-                {% for v in versions %}
-                  <li>• {{ v }}</li>
+                {% for entry in versions %}
+                  <li class="d-flex justify-content-between align-items-center mb-2">
+                    <span>{{ entry.version }}</span>
+                    <button class="btn btn-sm btn-outline-secondary view-log"
+                            data-index="{{ loop.index0 }}">
+                      Ver log
+                    </button>
+                  </li>
                 {% endfor %}
               {% else %}
                 <li>Nenhuma versão executada ainda.</li>
@@ -43,8 +46,7 @@
             </ul>
           </div>
         </div>
-
-        <!-- Log de execução -->
+        <!-- Log de execução inline -->
         {% if output %}
         <div class="col-12">
           <div class="log-card p-3">
@@ -52,12 +54,18 @@
           </div>
         </div>
         {% endif %}
-
       </div>
     </div>
   </div>
 
-  <!-- Formulário escondido que será submetido no final -->
+  <!-- Preloads de logs (hidden) -->
+  <div style="display:none;">
+    {% for entry in versions %}
+      <pre id="log-{{ loop.index0 }}">{{ entry.log }}</pre>
+    {% endfor %}
+  </div>
+
+  <!-- Formulário escondido -->
   <form id="update-form" method="post" style="display:none;">
     <input type="hidden" name="version" id="version-field">
   </form>
@@ -65,25 +73,21 @@
   <!-- Wizard multi‐step -->
   <div id="wizard" class="wizard-modal" style="display:none;">
     <div class="wizard-card">
-      <!-- Passo 1 -->
       <div id="step1" class="wizard-step">
         <p>Tem atualização de banco de dados?</p>
         <button class="wizard-btn btn btn-secondary me-2" data-answer="yes">Sim</button>
         <button class="wizard-btn btn btn-secondary"       data-answer="no">Não</button>
       </div>
-      <!-- Passo 2 -->
       <div id="step2" class="wizard-step" style="display:none;">
         <p>Atualização do banco foi aplicada?</p>
         <button class="wizard-btn btn btn-secondary me-2" data-answer="yes">Sim</button>
         <button class="wizard-btn btn btn-secondary"       data-answer="no">Não</button>
       </div>
-      <!-- Passo 3 -->
       <div id="step3" class="wizard-step" style="display:none;">
         <p>Digite a versão do Git:</p>
         <div class="input-group mb-3">
           <span class="input-group-text">Git v</span>
-          <input type="text" id="version-input" class="form-control"
-                 placeholder="1.11.05" required>
+          <input type="text" id="version-input" class="form-control" placeholder="1.11.05" required>
         </div>
         <div>
           <button id="btn-back" class="btn btn-link">Voltar</button>
@@ -93,56 +97,74 @@
     </div>
   </div>
 
-  <!-- Script do wizard -->
+  <!-- Modal para exibir log -->
+  <div class="modal fade" id="logModal" tabindex="-1" aria-labelledby="logModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"><div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logModalLabel">Log de Execução</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <pre id="modalLogContent"></pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Scripts JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // wizard
       const btnStart = document.getElementById('btn-start-update');
       const wizard   = document.getElementById('wizard');
       const form     = document.getElementById('update-form');
-      const versionField = document.getElementById('version-field');
-      const versionInput = document.getElementById('version-input');
+      const vField   = document.getElementById('version-field');
+      const vInput   = document.getElementById('version-input');
       let step = 1;
 
       function showStep(n) {
         step = n;
         [1,2,3].forEach(i => {
-          const el = document.getElementById('step' + i);
-          if (el) el.style.display = (i === n ? 'block' : 'none');
+          const el = document.getElementById('step'+i);
+          if (el) el.style.display = (i===n?'block':'none');
         });
       }
-
       btnStart.addEventListener('click', () => {
-        wizard.style.display = 'flex';
-        showStep(1);
+        wizard.style.display = 'flex'; showStep(1);
       });
-
       document.querySelectorAll('.wizard-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const ans = btn.getAttribute('data-answer');
-          if (step === 1) {
-            if (ans === 'yes') showStep(2);
-            else               showStep(3);
-          } else if (step === 2) {
-            if (ans === 'yes') showStep(3);
-            else               alert('Execute a atualização do banco antes de continuar.');
+          if (step===1) ans==='yes'?showStep(2):showStep(3);
+          else if (step===2) {
+            if (ans==='yes') showStep(3);
+            else alert('Execute a atualização do banco antes de continuar.');
           }
         });
       });
+      document.getElementById('btn-back').addEventListener('click', e => {
+        e.preventDefault();
+        showStep(step===3 && document.getElementById('step2').style.display==='block'?2:1);
+      });
+      document.getElementById('btn-finish').addEventListener('click', e => {
+        e.preventDefault();
+        const v = vInput.value.trim();
+        if (!v) { alert('Digite a versão do Git.'); return; }
+        vField.value = v; form.submit();
+      });
 
-      document.getElementById('btn-back')
-        .addEventListener('click', e => {
-          e.preventDefault();
-          showStep(step === 3 && document.getElementById('step2').style.display === 'block' ? 2 : 1);
+      // view-log
+      document.querySelectorAll('.view-log').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = btn.getAttribute('data-index');
+          const log = document.getElementById(`log-${idx}`).textContent;
+          document.getElementById('modalLogContent').textContent = log;
+          new bootstrap.Modal(document.getElementById('logModal')).show();
         });
-
-      document.getElementById('btn-finish')
-        .addEventListener('click', e => {
-          e.preventDefault();
-          const v = versionInput.value.trim();
-          if (!v) { alert('Digite a versão do Git.'); return; }
-          versionField.value = v;
-          form.submit();
-        });
+      });
     });
   </script>
 </body>

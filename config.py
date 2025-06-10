@@ -20,3 +20,7 @@ LDAP_BIND_PASSWORD      = os.getenv("LDAP_BIND_PASSWORD")
 LDAP_BASE_DN            = os.getenv("LDAP_BASE_DN")
 LDAP_USER_SEARCH_FILTER = os.getenv("LDAP_USER_SEARCH_FILTER")
 LDAP_GROUP_DN           = os.getenv("LDAP_GROUP_DN")
+
+# —————— HISTÓRICO ——————
+# Arquivo CSV que vai armazenar (version, log)
+HISTORY_FILE = os.getenv("HISTORY_FILE", "history.csv")
