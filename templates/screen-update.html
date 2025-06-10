@@ -16,15 +16,24 @@
 </head>
 <body>
   <div class="home-container">
-    <div class="container py-5">
+    <div class="container py-4 position-relative">
+      <!-- Botão de Logout -->
+      <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-box-arrow-right"></i> Sair
+        </a>
+      </div>
+
       <div class="row gy-4">
         <!-- Botão que dispara o wizard -->
         <div class="col-md-6 d-flex justify-content-center">
           <button id="btn-start-update"
                   class="btn btn-outline-primary btn-lg rounded-pill px-4">
-            Atualizar PGI <i class="bi bi-arrow-right ms-2"></i>
+            Atualizar PGI
+            <i class="bi bi-arrow-right ms-2"></i>
           </button>
         </div>
+
         <!-- Histórico de versões -->
         <div class="col-md-4 offset-md-2">
           <div class="versions-card p-4">
@@ -36,7 +45,7 @@
                     <span>{{ entry.version }}</span>
                     <button class="btn btn-sm btn-outline-secondary view-log"
                             data-index="{{ loop.index0 }}">
-                      Ver log
+                      <i class="bi bi-journal-text"></i>
                     </button>
                   </li>
                 {% endfor %}
@@ -46,6 +55,7 @@
             </ul>
           </div>
         </div>
+
         <!-- Log de execução inline -->
         {% if output %}
         <div class="col-12">
@@ -65,31 +75,41 @@
     {% endfor %}
   </div>
 
-  <!-- Formulário escondido -->
+  <!-- Formulário escondido para submissão -->
   <form id="update-form" method="post" style="display:none;">
     <input type="hidden" name="version" id="version-field">
   </form>
 
   <!-- Wizard multi‐step -->
-  <div id="wizard" class="wizard-modal" style="display:none;">
+  <div id="wizard" class="wizard-modal">
     <div class="wizard-card">
+      <!-- Passo 1 -->
       <div id="step1" class="wizard-step">
         <p>Tem atualização de banco de dados?</p>
         <button class="wizard-btn btn btn-secondary me-2" data-answer="yes">Sim</button>
         <button class="wizard-btn btn btn-secondary"       data-answer="no">Não</button>
       </div>
+      <!-- Passo 2 -->
       <div id="step2" class="wizard-step" style="display:none;">
         <p>Atualização do banco foi aplicada?</p>
         <button class="wizard-btn btn btn-secondary me-2" data-answer="yes">Sim</button>
         <button class="wizard-btn btn btn-secondary"       data-answer="no">Não</button>
+
+        <!-- Mensagem de bloqueio se responder “Não” -->
+        <div id="step2-error" class="text-danger mt-3" style="display:none;">
+          <p>A atualização de Git da aplicação não pode ser executada.<br>
+          Finalize a atualização do banco de dados antes de continuar.</p>
+          <button id="step2-error-ok" class="btn btn-sm btn-primary">OK</button>
+        </div>
       </div>
+      <!-- Passo 3 -->
       <div id="step3" class="wizard-step" style="display:none;">
         <p>Digite a versão do Git:</p>
         <div class="input-group mb-3">
           <span class="input-group-text">Git v</span>
-          <input type="text" id="version-input" class="form-control" placeholder="1.11.05" required>
+          <input type="text" id="version-input" class="form-control" placeholder="1.11.05">
         </div>
-        <div>
+        <div class="d-flex justify-content-between">
           <button id="btn-back" class="btn btn-link">Voltar</button>
           <button id="btn-finish" class="btn btn-primary">Atualizar</button>
         </div>
@@ -102,7 +122,7 @@
     <div class="modal-dialog modal-lg"><div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="logModalLabel">Log de Execução</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         <pre id="modalLogContent"></pre>
@@ -117,12 +137,16 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // wizard
-      const btnStart = document.getElementById('btn-start-update');
-      const wizard   = document.getElementById('wizard');
-      const form     = document.getElementById('update-form');
-      const vField   = document.getElementById('version-field');
-      const vInput   = document.getElementById('version-input');
+      const btnStart     = document.getElementById('btn-start-update');
+      const wizard       = document.getElementById('wizard');
+      const form         = document.getElementById('update-form');
+      const versionField = document.getElementById('version-field');
+      const versionInput = document.getElementById('version-input');
+
+      const step1Btns    = document.querySelectorAll('#step1 .wizard-btn');
+      const step2Btns    = document.querySelectorAll('#step2 .wizard-btn');
+      const step2Error   = document.getElementById('step2-error');
+      const step2ErrorOk = document.getElementById('step2-error-ok');
       let step = 1;
 
       function showStep(n) {
@@ -131,35 +155,62 @@
           const el = document.getElementById('step'+i);
           if (el) el.style.display = (i===n?'block':'none');
         });
+        wizard.style.display = 'flex';
+        // sempre esconde o erro ao entrar no passo 2
+        if (n === 2) step2Error.style.display = 'none';
       }
-      btnStart.addEventListener('click', () => {
-        wizard.style.display = 'flex'; showStep(1);
-      });
-      document.querySelectorAll('.wizard-btn').forEach(btn => {
+
+      // iniciar
+      btnStart.addEventListener('click', () => showStep(1));
+
+      // passo 1
+      step1Btns.forEach(btn => {
         btn.addEventListener('click', () => {
-          const ans = btn.getAttribute('data-answer');
-          if (step===1) ans==='yes'?showStep(2):showStep(3);
-          else if (step===2) {
-            if (ans==='yes') showStep(3);
-            else alert('Execute a atualização do banco antes de continuar.');
+          const ans = btn.dataset.answer;
+          ans === 'yes' ? showStep(2) : showStep(3);
+        });
+      });
+
+      // passo 2
+      step2Btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const ans = btn.dataset.answer;
+          if (ans === 'yes') {
+            showStep(3);
+          } else {
+            // mostra mensagem e mantém no passo 2
+            step2Error.style.display = 'block';
           }
         });
       });
-      document.getElementById('btn-back').addEventListener('click', e => {
-        e.preventDefault();
-        showStep(step===3 && document.getElementById('step2').style.display==='block'?2:1);
+
+      // OK do erro
+      step2ErrorOk.addEventListener('click', () => {
+        wizard.style.display = 'none';
       });
-      document.getElementById('btn-finish').addEventListener('click', e => {
-        e.preventDefault();
-        const v = vInput.value.trim();
-        if (!v) { alert('Digite a versão do Git.'); return; }
-        vField.value = v; form.submit();
-      });
+
+      // voltar no passo 3
+      document.getElementById('btn-back')
+        .addEventListener('click', e => {
+          e.preventDefault();
+          // se o passo2 estiver acessível, volta a ele, senão ao 1
+          showStep( document.getElementById('step2').style.display==='block' ? 2 : 1 );
+        });
+
+      // finalizar no passo 3
+      document.getElementById('btn-finish')
+        .addEventListener('click', e => {
+          e.preventDefault();
+          const v = versionInput.value.trim();
+          if (!v) { alert('Digite a versão do Git.'); return; }
+          versionField.value = v;
+          form.submit();
+        });
 
       // view-log
       document.querySelectorAll('.view-log').forEach(btn => {
         btn.addEventListener('click', () => {
-          const idx = btn.getAttribute('data-index');
+          const idx = btn.dataset.index;
           const log = document.getElementById(`log-${idx}`).textContent;
           document.getElementById('modalLogContent').textContent = log;
           new bootstrap.Modal(document.getElementById('logModal')).show();

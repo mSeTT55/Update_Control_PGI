@@ -1,5 +1,6 @@
 import os
 import csv
+from datetime import timedelta
 from dotenv import load_dotenv
 from flask import (
     Flask, render_template, request,
@@ -12,12 +13,14 @@ from callback_ldap_auth import authenticate_and_authorize
 from callbacks_update import ssh_login, run_update
 from config import HISTORY_FILE
 
-# carrega as variáveis de .env
+# carrega as variáveis do .env
 load_dotenv()
 secret = os.getenv("FLASK_SECRET", os.urandom(24).hex())
 
 app = Flask(__name__)
 app.secret_key = secret
+# Sessão permanente: expira em 3 horas
+app.permanent_session_lifetime = timedelta(hours=3)
 logging.basicConfig(level=logging.INFO)
 
 # —————— Carrega histórico do CSV ——————
@@ -25,9 +28,7 @@ executed_versions = []
 if os.path.exists(HISTORY_FILE):
     with open(HISTORY_FILE, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
-        # lemos na ordem cronológica (antigo → novo) e depois invert
-        rows = list(reader)
-        for row in reversed(rows):
+        for row in reversed(list(reader)):
             executed_versions.append({
                 'version': row['version'],
                 'log': row['log']
@@ -54,6 +55,7 @@ def login():
         user = request.form["username"]
         pwd  = request.form["password"]
         if authenticate_and_authorize(user, pwd):
+            session.permanent = True
             session["username"] = user
             return redirect(url_for("index"))
         else:
@@ -69,30 +71,21 @@ def logout():
 @login_required
 def index():
     output = None
-
     if request.method == "POST":
-        # pega a versão do formulário
         version = request.form.get("version", "").strip()
         if version:
-            version_label = f"Git v{version}"
-            # executa o update via SSH
+            label = f"Git v{version}"
             ssh = ssh_login(app.logger)
             output = run_update(ssh, app.logger)
-
-            # adiciona ao histórico em memória
-            executed_versions.insert(0, {
-                'version': version_label,
-                'log': output
-            })
-
-            # salva no CSV (cria header se não existir)
-            file_exists = os.path.exists(HISTORY_FILE)
+            # atualiza histórico em memória
+            executed_versions.insert(0, {'version': label, 'log': output})
+            # persiste no CSV
+            new_file = not os.path.exists(HISTORY_FILE)
             with open(HISTORY_FILE, 'a', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
-                if not file_exists:
+                if new_file:
                     writer.writerow(['version', 'log'])
-                writer.writerow([version_label, output])
-
+                writer.writerow([label, output])
     return render_template(
         "screen-update.html",
         output=output,
