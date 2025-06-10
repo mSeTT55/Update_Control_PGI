@@ -15,17 +15,17 @@
     rel="stylesheet"
   >
 
-  <!-- Todo o CSS desta tela -->
+  <!-- CSS específico desta tela -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/screen-update.css') }}">
 </head>
 <body>
-  <!-- ========== HEADER ========== -->
+  <!-- HEADER -->
   <header class="header d-flex justify-content-between align-items-center px-4">
     <div class="d-flex align-items-center">
       <img src="{{ url_for('static', filename='assets/logoor.png') }}"
            alt="Logo OR"
            class="logo-img me-3">
-      <h1 class="header-title">Atualizar PGI</h1>
+      <h1 class="header-title">Controle de atualizações PGI</h1>
     </div>
     <div>
       <a href="{{ url_for('logout') }}" title="Sair">
@@ -34,7 +34,7 @@
     </div>
   </header>
 
-  <!-- ========== MAIN CONTENT ========== -->
+  <!-- MAIN CONTENT -->
   <main class="main-content container my-5">
     <div class="row gx-4 gy-4 content-row">
       <!-- BOTÃO “Atualizar PGI” -->
@@ -65,15 +65,6 @@
           </ul>
         </div>
       </div>
-
-      <!-- LOG INLINE (se houver) -->
-      {% if output %}
-      <div class="col-12">
-        <div class="log-card mt-4 p-3">
-          <pre class="mb-0">{{ output }}</pre>
-        </div>
-      </div>
-      {% endif %}
     </div>
   </main>
 
@@ -89,27 +80,24 @@
     <input type="hidden" name="version" id="version-field">
   </form>
 
-  <!-- WIZARD multi-step -->
+  <!-- WIZARD multi-step (iguais os seus passos originais) -->
   <div id="wizard" class="wizard-modal">
     <div class="wizard-card">
-      <!-- Passo 1 -->
       <div id="step1" class="wizard-step">
         <p>Tem atualização de banco de dados?</p>
         <button class="wizard-btn btn btn-secondary me-2" data-answer="yes">Sim</button>
         <button class="wizard-btn btn btn-secondary"        data-answer="no">Não</button>
       </div>
-      <!-- Passo 2 -->
       <div id="step2" class="wizard-step" style="display:none;">
         <p>Atualização do banco foi aplicada?</p>
         <button class="wizard-btn btn btn-secondary me-2" data-answer="yes">Sim</button>
         <button class="wizard-btn btn btn-secondary"        data-answer="no">Não</button>
         <div id="step2-error" class="alert alert-danger mt-3" style="display:none;">
-          <p>A atualização de Git da aplicação não pode ser executada.<br>
-          Finalize a atualização do banco de dados antes de continuar.</p>
+          <p class="mb-2">A atualização de Git da aplicação não pode ser executada.<br>
+             Finalize a atualização do banco de dados antes de continuar.</p>
           <button id="step2-error-ok" class="btn btn-sm btn-primary">OK</button>
         </div>
       </div>
-      <!-- Passo 3 -->
       <div id="step3" class="wizard-step" style="display:none;">
         <p>Digite a versão do Git:</p>
         <div class="input-group mb-3">
@@ -140,10 +128,28 @@
     </div></div>
   </div>
 
+  <!-- MODAL “Resultado” -->
+  <div class="modal fade" id="updateResultModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content">
+      <div class="modal-header border-0 align-items-center">
+        <i class="bi bi-check-circle-fill text-success fs-1 me-3"></i>
+        <h5 class="modal-title">Atualização Concluída</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <pre id="modalLogContentResult" style="max-height:400px;overflow:auto;"></pre>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success w-100" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div></div>
+  </div>
+
   <!-- Bootstrap JS bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // WIZARD
       const btnStart     = document.getElementById('btn-start-update');
       const wizard       = document.getElementById('wizard');
       const form         = document.getElementById('update-form');
@@ -199,6 +205,7 @@
         form.submit();
       });
 
+      // VIEW-LOG
       document.querySelectorAll('.view-log-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const idx = btn.dataset.index;
@@ -207,6 +214,13 @@
           new bootstrap.Modal(document.getElementById('logModal')).show();
         });
       });
+
+      // UPDATE RESULT MODAL
+      {% if output %}
+      const resultModal = new bootstrap.Modal(document.getElementById('updateResultModal'));
+      document.getElementById('modalLogContentResult').textContent = `{{ output | e }}`;
+      resultModal.show();
+      {% endif %}
     });
   </script>
 </body>
