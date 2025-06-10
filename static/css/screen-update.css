@@ -1,81 +1,157 @@
-/* screen-update.css */
+/* =============================
+   RESET E BASE
+   ============================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f4f6f9;
+  color: #283E51;
+}
 
 /* =============================
-   Cartão “Atualizar PGI”
+   HEADER GRADIENTE
    ============================= */
-.update-card {
-  background: #ffffff;
-  border: 2px solid var(--primary-color);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-  text-align: center;
+.header {
+  background: linear-gradient(135deg, #283E51 0%, #4B79A1 100%);
+  padding: 26px 24px;
+  border-bottom: 3px solid #FFA80B;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.update-card .btn {
+.logo-img {
+  height: 40px;
+}
+.header-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+.logout-icon {
+  font-size: 1.5rem;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+/* =============================
+   MAIN CONTENT
+   ============================= */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+.content-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+/* ============== BOTÃO “Atualizar PGI” ============== */
+.update-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.btn-consultar {
+  background-color: #FAA80A;
+  color: #fff;
+  border: none;
+  height: 80px;
+  line-height: 36px;    /* alinha verticalmente o texto */
+  padding: 0 30px;      /* só mantém o padding horizontal */        /* <— vertical 4px, horizontal 30px */
+  font-size: 1.2rem;
   font-weight: 600;
+  border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: background 0.3s ease;
+  line-height: 1.2;         /* opcional: ajusta espaçamento interno do texto */
 }
 
-/* =============================
-   Cartão “Últimas versões”
-   ============================= */
+.btn-consultar:hover {
+  background-color: #e69400;
+}
+
+/* ============== HISTÓRICO DE VERSÕES ============== */
+.versions-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
 .versions-card {
-  background: #ffffff;
-  border: 2px solid var(--primary-color);
+  background: #fff;
+  border: 1px solid #d1d1d1;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 .versions-card h5 {
+  font-size: 18px;
   font-weight: 600;
-  color: var(--primary-color);
   margin-bottom: 1rem;
+  color: #283E51;
 }
 .versions-card ul {
   list-style: none;
-  padding-left: 0;
+  margin: 0;
+  padding: 0;
 }
-.versions-card ul li {
-  margin-bottom: 0.5rem;
-  color: var(--secondary-color);
+.version-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+.view-log-btn {
+  background: none;
+  border: none;
+  color: #283E51;
+  font-size: 1.2rem;
+  cursor: pointer;
 }
 
-/* =============================
-   Cartão de Log de Execução
-   ============================= */
+/* ============== LOG INLINE ============== */
 .log-card {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid var(--secondary-color);
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #6c757d;
   border-radius: 6px;
-  max-height: 300px;
+  max-width: 800px;
+  margin: 2rem auto 0;
+  padding: 1rem;
   overflow-y: auto;
   font-size: 0.9rem;
-  line-height: 1.3;
-  padding: 1rem;
+  line-height: 1.4;
 }
 
-/* =============================
-   Wizard (formulário passo-a-passo)
-   ============================= */
+/* ============== WIZARD (POP-UP) ============== */
 .wizard-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: none;               /* será ativado por JS */
+  display: none;
   justify-content: center;
   align-items: center;
+  background: rgba(0,0,0,0.5);
   z-index: 1000;
 }
 .wizard-card {
   background: #fff;
   border-radius: 8px;
+  padding: 1.5rem;
   width: 320px;
   text-align: center;
 }
-.wizard-step {
-  padding: 1.5rem;
-}
 .wizard-step p {
-  font-weight: 500;
+  font-size: 1rem;
   margin-bottom: 1rem;
 }
 .wizard-btn {
@@ -83,13 +159,13 @@
   margin: 0.25rem;
 }
 
-/* =============================
-   Responsividade
-   ============================= */
+/* ============== RESPONSIVIDADE ============== */
 @media (max-width: 768px) {
-  .update-card,
+  .content-row {
+    flex-direction: column;
+    align-items: center;
+  }
   .versions-card {
-    width: 100% !important;
-    margin-bottom: 1rem;
+    max-width: 100%;
   }
 }
