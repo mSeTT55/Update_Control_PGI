@@ -1,5 +1,3 @@
-# app.py
-
 import os
 from dotenv import load_dotenv
 from flask import (
@@ -20,7 +18,9 @@ app = Flask(__name__)
 app.secret_key = secret
 logging.basicConfig(level=logging.INFO)
 
-# decorator de sessão
+# lista em memória das versões já executadas
+executed_versions = []
+
 def login_required(view):
     @wraps(view)
     def wrapped_view(*args, **kwargs):
@@ -31,8 +31,7 @@ def login_required(view):
 
 @app.before_request
 def require_login():
-    # rotas que não precisam de login
-    public = ("login", "static")
+    public = ("login", "static", "logout")
     if request.endpoint not in public and "username" not in session:
         return redirect(url_for("login"))
 
@@ -58,10 +57,22 @@ def logout():
 @login_required
 def index():
     output = None
+
     if request.method == "POST":
+        # lê a versão informada pelo wizard
+        version = request.form.get("version", "").strip()
+        if version:
+            executed_versions.insert(0, f"Git v{version}")
+
+        # executa o update via SSH
         ssh = ssh_login(app.logger)
         output = run_update(ssh, app.logger)
-    return render_template("screen-update.html", output=output)
+
+    return render_template(
+        "screen-update.html",
+        output=output,
+        versions=executed_versions
+    )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

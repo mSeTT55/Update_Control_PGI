@@ -11,8 +11,6 @@
   padding: 2rem;
   text-align: center;
 }
-
-/* Deixa o botão do update em destaque */
 .update-card .btn {
   font-weight: 600;
 }
@@ -27,18 +25,15 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 2rem;
 }
-
 .versions-card h5 {
   font-weight: 600;
   color: var(--primary-color);
   margin-bottom: 1rem;
 }
-
 .versions-card ul {
   list-style: none;
   padding-left: 0;
 }
-
 .versions-card ul li {
   margin-bottom: 0.5rem;
   color: var(--secondary-color);
@@ -56,6 +51,36 @@
   font-size: 0.9rem;
   line-height: 1.3;
   padding: 1rem;
+}
+
+/* =============================
+   Wizard (formulário passo-a-passo)
+   ============================= */
+.wizard-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;               /* será ativado por JS */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.wizard-card {
+  background: #fff;
+  border-radius: 8px;
+  width: 320px;
+  text-align: center;
+}
+.wizard-step {
+  padding: 1.5rem;
+}
+.wizard-step p {
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+.wizard-btn {
+  width: 100px;
+  margin: 0.25rem;
 }
 
 /* =============================
