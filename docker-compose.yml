@@ -1,0 +1,8 @@
+services:
+  app:
+    image: 'button_update_pgi:latest'
+    build:
+      context: .
+    container_name: button_update_pgi
+    ports:
+      - 8054:8054
