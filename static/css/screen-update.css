@@ -1,21 +1,16 @@
-/* =============================
-   RESET E BASE
-   ============================= */
-* {
-  margin: 0; padding: 0; box-sizing: border-box;
-}
+/* RESET & BASE */
+* { margin:0; padding:0; box-sizing:border-box; }
 body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #f4f6f9;
-  color: #283E51;
+  font-family:'Poppins',sans-serif;
+  background-color:#f4f6f9;
+  color:#283E51;
 }
 
-/* =============================
-   HEADER GRADIENTE
-   ============================= */
+/* HEADER GRADIENTE */
 .header {
-  background: linear-gradient(135deg, #283E51 0%, #4B79A1 100%);
-  padding: 30px 24px;
+  position: relative;
+  background: linear-gradient(135deg,#283E51 0%,#4B79A1 100%);
+  padding: 26px 24px;
   border-bottom: 3px solid #FFA80B;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
@@ -23,23 +18,40 @@ body {
   justify-content: space-between;
   align-items: center;
 }
-.logo-img { height: 40px; }
-.header-title {
-  font-size: 32px; font-weight: 700; color: #ffffff; margin: 0;
-}
-.logout-icon { font-size: 1.5rem; color: #ffffff; cursor: pointer; }
 
-/* =============================
-   MAIN CONTENT
-   ============================= */
-.main-content { max-width: 1200px; margin: 0 auto; padding: 10px 20px; }
+.header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.logo-img { height:40px; }
+
+.logout-icon {
+  font-size:1.5rem;
+  color:#fff;
+  cursor:pointer;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  max-width:1200px;
+  margin:0 auto;
+  padding:40px 20px;
+}
 .content-row {
-  display: flex; flex-wrap: wrap; justify-content: space-between;
-  gap: 2rem;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:2rem;
 }
 
 /* BOTÃO “Atualizar PGI” */
-.update-section { flex: 1; display: flex; justify-content: center; }
+.update-section { flex:1; display:flex; justify-content:center; }
 .btn-consultar {
   background-color: #FAA80A;
   color: #fff;
@@ -54,53 +66,84 @@ body {
   transition: background 0.3s ease;
   line-height: 1.2;         /* opcional: ajusta espaçamento interno do texto */
 }
-.btn-consultar:hover { background-color: #e69400; }
+.btn-consultar:hover { background-color:#e69400; }
 
-/* HISTÓRICO DE VERSÕES */
-.versions-section { flex: 1; display: flex; justify-content: center; }
+/* VERSIONS CARD */
+.versions-section { flex:1; display:flex; justify-content:center; }
 .versions-card {
-  background: #fff; border: 1px solid #d1d1d1; border-radius: 12px;
-  padding: 1.5rem; width: 100%; max-width: 360px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  background:#fff;
+  border:1px solid #d1d1d1;
+  border-radius:12px;
+  padding:1.5rem;
+  width:100%;
+  max-width:360px;
+  box-shadow:0 4px 8px rgba(0,0,0,0.1);
 }
 .versions-card h5 {
-  font-size: 18px; font-weight: 600; margin-bottom: 1rem;
-  color: #283E51;
+  font-size:18px;
+  font-weight:600;
+  margin-bottom:1rem;
+  color:#283E51;
 }
 .versions-card ul {
-  max-height: 300px;    /* altura máxima antes de rolar */
-  overflow-y: auto;     /* habilita a scrollbar vertical */
-  padding-right: 0.5rem;/* garante espaço para a barra não cortar o texto */
+  list-style:none;
+  margin:0;
+  padding:0;
+  max-height:300px;    /* limita altura e ativa scroll */
+  overflow-y:auto;
+  padding-right:0.5rem;
+}
+.versions-card ul::-webkit-scrollbar { width:6px; }
+.versions-card ul::-webkit-scrollbar-thumb {
+  background-color:rgba(0,0,0,0.2);
+  border-radius:3px;
 }
 .version-item {
-  display: flex; justify-content: space-between;
-  align-items: center; margin-bottom: 0.75rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:0.75rem;
 }
 .view-log-btn {
-  background: none; border: none; color: #283E51;
-  font-size: 1.2rem; cursor: pointer;
+  background:none;
+  border:none;
+  color:#283E51;
+  font-size:1.2rem;
+  cursor:pointer;
 }
 
-/* WIZARD (POP-UP) */
+/* LOG INLINE (escondido, usamos modal) */
+.log-card { display:none; }
+
+/* WIZARD POP-UP */
 .wizard-modal {
-  position: fixed; inset: 0; display: none;
-  justify-content: center; align-items: center;
-  background: rgba(0,0,0,0.5); z-index: 1000;
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.5);
+  z-index:1000;
 }
 .wizard-card {
-  background: #fff; border-radius: 8px; padding: 1.5rem;
-  width: 320px; text-align: center;
+  background:#fff;
+  border-radius:8px;
+  padding:1.5rem;
+  width:320px;
+  text-align:center;
+  position:relative;  /* para o btn-close */
 }
-.wizard-step p { font-size: 1rem; margin-bottom: 1rem; }
-.wizard-btn { width: 100px; margin: 0.25rem; }
-
-/* MODAL “Ver Log” e “Resultado” herdam do Bootstrap */
-
-/* LOG INLINE (não aparece mais inline) */
-.log-card { display: none; }
+.wizard-step p {
+  font-size:1rem;
+  margin-bottom:1rem;
+}
+.wizard-btn {
+  width:100px;
+  margin:0.25rem;
+}
 
 /* RESPONSIVIDADE */
-@media (max-width: 768px) {
-  .content-row { flex-direction: column; align-items: center; }
-  .versions-card { max-width: 100%; }
+@media (max-width:768px) {
+  .content-row { flex-direction:column; align-items:center; }
+  .versions-card { max-width:100%; }
 }
