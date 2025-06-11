@@ -70,26 +70,43 @@ def logout():
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    output = None
+    # PRG: pega do session (pop) se veio de um POST
+    output = session.pop('last_output', None)
+    current_version = session.pop('current_version', None)
+
     if request.method == "POST":
         version = request.form.get("version", "").strip()
         if version:
-            label = f"Git v{version}"
+            current_version = f"Git v{version}"
+            # executa o update via SSH
             ssh = ssh_login(app.logger)
             output = run_update(ssh, app.logger)
-            # atualiza histórico em memória
-            executed_versions.insert(0, {'version': label, 'log': output})
-            # persiste no CSV
+
+            # atualiza histórico em memória e no CSV
+            executed_versions.insert(0, {
+                'version': current_version,
+                'log': output
+            })
             new_file = not os.path.exists(HISTORY_FILE)
             with open(HISTORY_FILE, 'a', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 if new_file:
                     writer.writerow(['version', 'log'])
-                writer.writerow([label, output])
+                writer.writerow([current_version, output])
+
+            # armazena na session para exibir no próximo GET
+            session['last_output'] = output
+            session['current_version'] = current_version
+
+        # redireciona para evitar reexecução no F5
+        return redirect(url_for('index'))
+
+    # GET: renderiza normalmente
     return render_template(
         "screen-update.html",
         output=output,
-        versions=executed_versions
+        versions=executed_versions,
+        current_version=current_version
     )
 
 if __name__ == "__main__":
