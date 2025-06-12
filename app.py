@@ -19,8 +19,8 @@ secret = os.getenv("FLASK_SECRET", os.urandom(24).hex())
 
 app = Flask(__name__)
 app.secret_key = secret
-# Sessão permanente: expira em 3 horas
-app.permanent_session_lifetime = timedelta(hours=3)
+# Sessão permanente: expira em 1 horas
+app.permanent_session_lifetime = timedelta(hours=1)
 logging.basicConfig(level=logging.INFO)
 
 # —————— Carrega histórico do CSV ——————
