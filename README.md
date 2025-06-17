@@ -25,14 +25,13 @@ Todo o histórico de execuções e logs é persistente mesmo após reinícios de
 ### Tela Principal
 ![image](https://github.com/user-attachments/assets/69459d73-39c2-42d5-b59b-7a532a0ee929)
 
-
 ### Wizard de Confirmação
 ![image](https://github.com/user-attachments/assets/d3da214e-5d0e-4afb-a66c-9f22c502d857)
-
 
 ### Modal de Log
 ![image](https://github.com/user-attachments/assets/e023aec7-4034-4bbc-91cf-d434fa9182fd)
 
+### Histórico de execução com Log
 ![image](https://github.com/user-attachments/assets/edab0a47-9837-4347-9725-63e7741f581d)
 
 
