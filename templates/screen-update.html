@@ -55,7 +55,9 @@
                   <span>{{ entry.version }}</span>
                   <button class="btn btn-sm view-log-btn"
                           data-index="{{ loop.index0 }}"
-                          data-version="{{ entry.version }}">
+                          data-version="{{ entry.version }}"
+                          data-user="{{ entry.user }}"
+                          data-time="{{ entry.time }}">
                     <i class="bi bi-journal-text"></i>
                   </button>
                 </li>
@@ -70,13 +72,14 @@
 
     <!-- LOG INLINE -->
     {% if output %}
-    <div class="row">
-      <div class="col-12">
-        <div class="log-card mt-5 p-3 mx-auto">
-          <h5>Log de Execução{% if current_version %} – {{ current_version }}{% endif %}</h5>
-          <pre class="mb-0">{{ output }}</pre>
-        </div>
-      </div>
+    <div class="log-card mt-5 p-3 mx-auto">
+      <h5>
+        Log de Execução
+        {% if current_version %} – {{ current_version }}{% endif %}
+        {% if current_user %} – {{ current_user }}{% endif %}
+        {% if current_time %} – {{ current_time }}{% endif %}
+      </h5>
+      <pre class="mb-0">{{ output }}</pre>
     </div>
     {% endif %}
   </main>
@@ -231,9 +234,16 @@
         btn.addEventListener('click', () => {
           const idx     = btn.dataset.index;
           const version = btn.dataset.version;
+          const user    = btn.dataset.user;
+          const time    = btn.dataset.time;
           const log     = document.getElementById(`log-${idx}`).textContent;
+
+          // monta o título completo
           document.getElementById('logModalLabel').textContent =
-            `Log de Execução - ${version}`;
+            `Log de Execução – ${version}`
+            + (user  ? ` – ${user}`  : '')
+            + (time  ? ` – ${time}`  : '');
+
           document.getElementById('modalLogContent').textContent = log;
           new bootstrap.Modal(document.getElementById('logModal')).show();
         });

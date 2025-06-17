@@ -1,6 +1,6 @@
 import os
 import csv
-from datetime import timedelta
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from flask import (
     Flask, render_template, request,
@@ -19,7 +19,7 @@ secret = os.getenv("FLASK_SECRET", os.urandom(24).hex())
 
 app = Flask(__name__)
 app.secret_key = secret
-# Sessão permanente: expira em 1 horas
+# Sessão permanente: expira em 1 hora
 app.permanent_session_lifetime = timedelta(hours=1)
 logging.basicConfig(level=logging.INFO)
 
@@ -30,8 +30,10 @@ if os.path.exists(HISTORY_FILE):
         reader = csv.DictReader(f)
         for row in reversed(list(reader)):
             executed_versions.append({
-                'version': row['version'],
-                'log': row['log']
+                'version': row.get('version', ''),
+                'log'    : row.get('log',     ''),
+                'user'   : row.get('user',    ''),
+                'time'   : row.get('time',    '')
             })
 
 def login_required(view):
@@ -70,9 +72,11 @@ def logout():
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    # PRG: pega do session (pop) se veio de um POST
-    output = session.pop('last_output', None)
+    # Post/Redirect/Get: lê e remove da session
+    output          = session.pop('last_output', None)
     current_version = session.pop('current_version', None)
+    current_user    = session.pop('current_user', None)
+    current_time    = session.pop('current_time', None)
 
     if request.method == "POST":
         version = request.form.get("version", "").strip()
@@ -82,31 +86,42 @@ def index():
             ssh = ssh_login(app.logger)
             output = run_update(ssh, app.logger)
 
-            # atualiza histórico em memória e no CSV
+            # coleta usuário e timestamp
+            current_user = session["username"]
+            current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+            # atualiza histórico em memória
             executed_versions.insert(0, {
                 'version': current_version,
-                'log': output
+                'log'    : output,
+                'user'   : current_user,
+                'time'   : current_time
             })
+
+            # persiste no CSV
             new_file = not os.path.exists(HISTORY_FILE)
             with open(HISTORY_FILE, 'a', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 if new_file:
-                    writer.writerow(['version', 'log'])
-                writer.writerow([current_version, output])
+                    writer.writerow(['version', 'log', 'user', 'time'])
+                writer.writerow([current_version, output, current_user, current_time])
 
-            # armazena na session para exibir no próximo GET
-            session['last_output'] = output
-            session['current_version'] = current_version
+            # salva na session e redireciona (PRG)
+            session['last_output']      = output
+            session['current_version']  = current_version
+            session['current_user']     = current_user
+            session['current_time']     = current_time
 
-        # redireciona para evitar reexecução no F5
         return redirect(url_for('index'))
 
-    # GET: renderiza normalmente
+    # GET render
     return render_template(
         "screen-update.html",
         output=output,
-        versions=executed_versions,
-        current_version=current_version
+        current_version=current_version,
+        current_user=current_user,
+        current_time=current_time,
+        versions=executed_versions
     )
 
 if __name__ == "__main__":
