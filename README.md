@@ -1,71 +1,76 @@
-🛠️ Update PGI – Controle de Atualizações
-Aplicação Flask para gestão e execução remota de atualizações do sistema PGI via SSH com autenticação por Active Directory (LDAP).
-Todo o histórico de versões e logs é persistente, mesmo após reinícios de container Docker.
+# 🛠️ Update PGI – Controle de Atualizações
+
+Aplicação Flask para execução remota de atualizações do sistema PGI via SSH com autenticação Active Directory (LDAP).
+Todo o histórico de execuções e logs é persistente mesmo após reinícios de container Docker.
 
 ---
 
-📋 Funcionalidades
-✅ Login com autenticação via Active Directory (LDAP)
+## 📋 Funcionalidades
 
-✅ Verificação de grupo no Active Directory antes de liberar acesso a aplicação
+- ✅ Login via Active Directory (LDAP)
+- ✅ Controle de acesso por grupo de segurança do AD
+- ✅ Execução remota de script via SSH com sudo
+- ✅ Wizard de confirmação (validação de atualização de banco + versão Git)
+- ✅ Registro da versão, usuário e data/hora de cada execução
+- ✅ Histórico persistente em CSV
+- ✅ Exibição dos logs por versão (modal)
+- ✅ Proteção contra reexecução em F5 (Post → Redirect → Get)
+- ✅ Dockerized
 
-✅ Execução de script remoto via SSH e sudo (sem senha)
+## 🎨 Screenshots 
 
-✅ Wizard de confirmação com múltiplas perguntas antes da atualização
+### Tela de Login
+![image](https://github.com/user-attachments/assets/67162b13-3853-4c07-9392-baca2bfb28dd)
 
-✅ Registro de versão, usuário e data/hora de cada execução
+### Tela Principal
+![image](https://github.com/user-attachments/assets/69459d73-39c2-42d5-b59b-7a532a0ee929)
 
-✅ Histórico de execuções persistido em CSV (com bind-mount para persistência)
 
-✅ Visualização do log de cada versão via modal na interface
+### Wizard de Confirmação
+![image](https://github.com/user-attachments/assets/d3da214e-5d0e-4afb-a66c-9f22c502d857)
 
-✅ Proteção contra reexecução ao dar F5 (Post → Redirect → Get)
 
-✅ Containerizado com Docker e Docker Compose
+### Modal de Log
+![image](https://github.com/user-attachments/assets/e023aec7-4034-4bbc-91cf-d434fa9182fd)
 
-🎨 Screenshots
-Aqui você pode adicionar imagens do layout. Exemplo:
+![image](https://github.com/user-attachments/assets/edab0a47-9837-4347-9725-63e7741f581d)
 
-Tela de Login:
-(adicione aqui seu print da tela de login com o fundo e form bonitos)
 
-Tela de Atualização:
-(adicione aqui print do header gradiente com o botão “Atualizar PGI” e o histórico de versões)
 
-Wizard de Confirmação:
-(print do wizard com as perguntas antes de executar)
+## ⚙️ Requisitos
 
-Modal de Log:
-(print do modal mostrando o log + versão + usuário + data/hora)
+- Docker
+- Docker Compose
+- Servidor com acesso SSH ao PGI
+- LDAP ativo com um grupo para validação de acesso
+- Service Account de leitura no AD
+- Chave SSH válida (sem senha)
 
-⚙️ Requisitos
-Docker e Docker Compose
+## 🐳 Executando via Docker Compose
 
-Acesso à rede com o Active Directory
+### 1. Crie o arquivo `.env` com as configurações:
 
-Acesso via SSH ao servidor PGI
-
-Service Account com permissão de bind LDAP
-
-Chave privada SSH com permissão de execução remota
-
-🐳 Executando via Docker Compose
-1. Crie o arquivo .env com as configurações:
-
+```
 FLASK_SECRET=uma_chave_secreta
+
 SSH_HOST=ip_do_servidor_pgi
 SSH_USER=pgi.service
 SSH_KEY_PATH=/caminho/dentro/do/container/.ssh/pgi.service
 SCRIPT_PATH=/dados/.pgi-update.sh
+
 LDAP_SERVER=ldap://ip_ou_dns_ad
 LDAP_BIND_DN=CN=...,OU=...,DC=...
 LDAP_BIND_PASSWORD=sua_senha_ldap
 LDAP_BASE_DN=DC=...
 LDAP_USER_SEARCH_FILTER=(sAMAccountName={username})
 LDAP_GROUP_DN=CN=Update-PGI,OU=...,DC=...
-HISTORY_FILE=data/history.csv
 
-2. Estrutura do Docker Compose:
+HISTORY_FILE=data/history.csv
+```
+
+### 2. Estrutura do `docker-compose.yml`
+
+```yaml
 version: '3.8'
 
 services:
@@ -77,15 +82,21 @@ services:
     env_file:
       - .env
     ports:
-      - "port:port"
+      - "port:port"            # ajuste conforme necessário
     volumes:
       - /dados/update_control_PGI:/button_update_PGI/data
     restart: unless-stopped
+```
 
-3. Build e subida:
+### 3. Build e inicialização:
+
+```bash
 docker compose up --build -d
+```
 
-📂 Estrutura de Pastas
+## 📂 Estrutura de Pastas
+
+```
 button_update_PGI/
 ├── app.py
 ├── callback_ldap_auth.py
@@ -105,11 +116,12 @@ button_update_PGI/
 │       └── screen-update.css
 └── /data
     └── history.csv
-✅ Segurança
-O .env não vai para o Git (está no .gitignore)
+```
 
-O history.csv também ignorado no Git
+## ✅ Segurança
 
-Uso de SSH Key + NOPASSWD no sudoers
-
-Sessões expiram após 1 hora
+- ✅ O `.env` está ignorado no Git (`.gitignore`)
+- ✅ O `history.csv` também está ignorado
+- ✅ Uso de **SSH Key** + **NOPASSWD** via sudoers para execução remota
+- ✅ Sessões Flask expiram após **1 hora**
+- ✅ Nenhuma credencial sensível dentro da imagem Docker (tudo via `.env`)
