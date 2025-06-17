@@ -1,5 +1,5 @@
 version,log
-1.11.12,Agent pid 271793
+1.11.12,"Agent pid 271793
 Identity added: /root/.ssh/updatepgior (/root/.ssh/updatepgior)
 remote: Enumerating objects: 9, done.[K
 remote: Counting objects:  11% (1/9)[K
@@ -74,3 +74,4 @@ fatal: failed to run repack
 unset SSH_AUTH_SOCK;
 unset SSH_AGENT_PID;
 echo Agent pid 271793 killed;
+"
