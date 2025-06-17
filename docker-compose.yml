@@ -6,3 +6,7 @@ services:
     container_name: button_update_pgi
     ports:
       - 8054:8054
+  env_file:
+      - .env
+  volumes:
+      - /dados/update_control_PGI:/button_update_PGI/data

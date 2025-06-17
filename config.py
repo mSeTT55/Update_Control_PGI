@@ -23,4 +23,4 @@ LDAP_GROUP_DN           = os.getenv("LDAP_GROUP_DN")
 
 # —————— HISTÓRICO ——————
 # Arquivo CSV que vai armazenar (version, log)
-HISTORY_FILE = os.getenv("HISTORY_FILE", "history.csv")
+HISTORY_FILE = os.getenv("HISTORY_FILE", "data/history.csv")
