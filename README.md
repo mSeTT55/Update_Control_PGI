@@ -51,9 +51,7 @@ Chave privada SSH com permissão de execução remota
 
 🐳 Executando via Docker Compose
 1. Crie o arquivo .env com as configurações:
-ini
-Copiar
-Editar
+
 FLASK_SECRET=uma_chave_secreta
 SSH_HOST=ip_do_servidor_pgi
 SSH_USER=pgi.service
@@ -66,10 +64,8 @@ LDAP_BASE_DN=DC=...
 LDAP_USER_SEARCH_FILTER=(sAMAccountName={username})
 LDAP_GROUP_DN=CN=Update-PGI,OU=...,DC=...
 HISTORY_FILE=data/history.csv
+
 2. Estrutura do Docker Compose:
-yaml
-Copiar
-Editar
 version: '3.8'
 
 services:
@@ -81,19 +77,15 @@ services:
     env_file:
       - .env
     ports:
-      - "5000:5000"
+      - "port:port"
     volumes:
       - /dados/update_control_PGI:/button_update_PGI/data
     restart: unless-stopped
+
 3. Build e subida:
-bash
-Copiar
-Editar
 docker compose up --build -d
+
 📂 Estrutura de Pastas
-bash
-Copiar
-Editar
 button_update_PGI/
 ├── app.py
 ├── callback_ldap_auth.py
